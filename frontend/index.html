@@ -1,0 +1,62 @@
+<form id="bookForm">
+  <input type="text" name="title" id="title" />
+  <input type="text" name="author" id="author" />
+  <input type="submit" value="submit">
+</form>
+<div class="button" onclick="getbooks()">get all books</div>
+<div id="bookList"></div>
+<script>
+    document.getElementById('bookForm').addEventListener('submit', async function(event) {
+        event.preventDefault();  // Prevent traditional form submission
+    
+        // Gather form data
+        const title = document.getElementById('title').value;
+        const author = document.getElementById('author').value;
+    
+        // Create JSON object
+        const data = {
+            title: title,
+            author: author
+        };
+    
+        try {
+            // Send data to the REST API
+            const response = await fetch('http://127.0.0.1:8000/books/books/insert/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+    
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Success:', result);
+    
+                // Update the book list with the new entry
+                const bookout = document.getElementById('bookList');
+    
+                // Assuming result includes the newly added book directly
+                const newEntry = `<p>${result.title} by ${result.author}</p>`;
+                bookout.innerHTML += newEntry;  // Append the new book to the list
+    
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+function getbooks(){
+    fetch('http://127.0.0.1:8000/books/books/')
+       .then(response => response.json())
+       .then(data => {
+            const bookout = document.getElementById('bookList');
+            data.forEach(book => {
+                const newEntry = `<p>${book.title} by ${book.author}</p>`;
+                bookout.innerHTML += newEntry;
+            });
+        })
+       .catch(error => console.error('Error:', error));
+}
+</script>
