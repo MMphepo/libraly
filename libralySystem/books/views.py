@@ -38,4 +38,12 @@ def book_detail(request, pk):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Create your views here.
+
+@api_view(['DELETE'])
+def delete_book(request, pk):
+    try:
+        book = Book.objects.get(pk=pk)
+    except Book.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    book.delete()
+    return Response({"status": "book deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
