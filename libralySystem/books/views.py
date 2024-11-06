@@ -7,7 +7,17 @@ from .serializer import BookSerializer
 @api_view(['GET'])
 def get_books(request):
     Books = Book.objects.all()
-    serializer = BookSerializer(Books, many=True)
+    
+    title_query = request.GET.get('title')
+    author_query = request.GET.get('author')
+    
+    if title_query:
+        Bookss = Books.filter(title__icontains=title_query)
+    
+    if author_query:
+        Bookss = Books.filter(author__icontains=author_query)
+
+    serializer = BookSerializer(Bookss, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
